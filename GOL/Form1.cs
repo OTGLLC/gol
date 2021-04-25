@@ -12,10 +12,13 @@ namespace GOL
 {
     public partial class Form1 : Form
     {
-        // The universe array
-        bool[,] universe = new bool[5, 5];
+        private const int UNIVERSE_WIDTH = 10;
+        private const int UNIVERSE_HEIGHT = 10;
 
-        // Drawing colors
+        // The universe array
+        bool[,] universe = new bool[10, 10];
+        bool[,] scratchPad;
+        // Drawing colors        
         Color gridColor = Color.Black;
         Color cellColor = Color.Gray;
 
@@ -25,6 +28,8 @@ namespace GOL
         // Generation count
         int generations = 0;
 
+        bool canTick;
+
         public Form1()
         {
             InitializeComponent();
@@ -33,6 +38,10 @@ namespace GOL
             timer.Interval = 100; // milliseconds
             timer.Tick += Timer_Tick;
             timer.Enabled = true; // start timer running
+
+            pauseSimButton.Enabled = false;
+            stopSimButton.Enabled = false;
+            canTick = false;
         }
 
         // Calculate the next generation of cells
@@ -50,6 +59,9 @@ namespace GOL
         // The event called by the timer every Interval milliseconds.
         private void Timer_Tick(object sender, EventArgs e)
         {
+            if (!canTick)
+                return;
+
             NextGeneration();
         }
 
@@ -61,8 +73,10 @@ namespace GOL
             // CELL HEIGHT = WINDOW HEIGHT / NUMBER OF CELLS IN Y
             int cellHeight = graphicsPanel1.ClientSize.Height / universe.GetLength(1);
 
+
             // A Pen for drawing the grid lines (color, width)
             Pen gridPen = new Pen(gridColor, 1);
+
 
             // A Brush for filling living cells interiors (color)
             Brush cellBrush = new SolidBrush(cellColor);
@@ -80,6 +94,7 @@ namespace GOL
                     cellRect.Width = cellWidth;
                     cellRect.Height = cellHeight;
 
+
                     // Fill the cell with a brush if alive
                     if (universe[x, y] == true)
                     {
@@ -88,9 +103,15 @@ namespace GOL
 
                     // Outline the cell with a pen
                     e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
+
+                    //evaluate neighbors
+                    int neighbors = 0;
+                    EvaluateNeighbors(x, y,ref neighbors, e,cellRect);
+                    PrintNeighborCount(neighbors, e, cellRect);
                 }
             }
 
+            
             // Cleaning up pens and brushes
             gridPen.Dispose();
             cellBrush.Dispose();
@@ -118,5 +139,125 @@ namespace GOL
                 graphicsPanel1.Invalidate();
             }
         }
+
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            for (int y = 0; y < universe.GetLength(1); y++)
+            {
+                // Iterate through the universe in the x, left to right
+                for (int x = 0; x < universe.GetLength(0); x++)
+                {
+                    universe[x, y] = false;
+                }
+            }
+
+            graphicsPanel1.Invalidate();
+        }
+
+        private void startSimButton_Click(object sender, EventArgs e)
+        {
+            HandleOnStart();
+        }
+
+        private void pauseSimButton_Click(object sender, EventArgs e)
+        {
+            HandleOnPause();
+        }
+
+        private void stopSimButton_Click(object sender, EventArgs e)
+        {
+            HandleOnStop();
+            ResetGenerations();
+        }
+
+        private void stepSimButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        #region Utility
+        private void HandleOnPause()
+        {
+            canTick = !canTick;
+
+        }
+        private void HandleOnStop()
+        {
+            canTick = false;
+            startSimButton.Enabled = true;
+            stopSimButton.Enabled = false;
+            pauseSimButton.Enabled = false;
+        }
+        private void HandleOnStart()
+        {
+            canTick = true;
+            pauseSimButton.Enabled = true;
+            stopSimButton.Enabled = true;
+            startSimButton.Enabled = false;
+        }
+        private void ResetGenerations()
+        {
+            generations = 0;
+            toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+        }
+        private void EvaluateNeighbors(int _sourceX, int _sourceY,ref int _neighborCount ,PaintEventArgs e, Rectangle _cellRect)
+        {
+            
+            if (universe[_sourceX, _sourceY])
+            {
+                EvaluateNeighbor(_sourceX + 1, _sourceY, ref _neighborCount);
+                EvaluateNeighbor(_sourceX + 1, _sourceY - 1, ref _neighborCount);
+                EvaluateNeighbor(_sourceX, _sourceY - 1, ref _neighborCount);
+                EvaluateNeighbor(_sourceX - 1, _sourceY - 1, ref _neighborCount);
+                EvaluateNeighbor(_sourceX - 1, _sourceY, ref _neighborCount);
+                EvaluateNeighbor(_sourceX - 1, _sourceY + 1, ref _neighborCount);
+                EvaluateNeighbor(_sourceX, _sourceY + 1, ref _neighborCount);
+                EvaluateNeighbor(_sourceX + 1, _sourceY + 1, ref _neighborCount);
+            }
+           
+        }
+        private void EvaluateNeighbor(int _sourceX, int _sourceY, ref int _neighborCount)
+        {
+            int targetX = 0;
+            int targetY = 0;
+
+            if (_sourceX < 0)
+            {
+                targetX = universe.GetLength(0) - 1;
+            }
+            else
+            {
+                targetX = _sourceX % universe.GetLength(0);
+            }
+
+            if (_sourceY < 0)
+            {
+                targetY = universe.GetLength(1) - 1;
+            }
+            else
+            {
+                targetY = _sourceY % universe.GetLength(1);
+            }
+
+           
+
+            if (universe[targetX, targetY])
+                _neighborCount++;
+
+        }
+        private void PrintNeighborCount(int _neighborCount,PaintEventArgs e, Rectangle _cellRect)
+        {
+            if (_neighborCount <= 0)
+                return;
+
+            Font font = new Font("Arial", 20f);
+
+            StringFormat stringFormat = new StringFormat();
+            stringFormat.Alignment = StringAlignment.Center;
+            stringFormat.LineAlignment = StringAlignment.Center;
+
+            e.Graphics.DrawString(_neighborCount.ToString(), font, Brushes.Black, _cellRect, stringFormat);
+        }
+        #endregion
     }
 }
