@@ -157,7 +157,7 @@ namespace GOL
                     universe[x, y] = false;
                 }
             }
-
+            ResetGenerations();
             graphicsPanel1.Invalidate();
         }
 
@@ -379,5 +379,6 @@ namespace GOL
             }
         }
         #endregion
+
     }
 }
