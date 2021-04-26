@@ -12,12 +12,12 @@ namespace GOL
 {
     public partial class Form1 : Form
     {
-        private const int UNIVERSE_WIDTH = 10;
-        private const int UNIVERSE_HEIGHT = 10;
+        private const int UNIVERSE_WIDTH = 20;
+        private const int UNIVERSE_HEIGHT = 20;
 
         // The universe array
-        bool[,] universe = new bool[10, 10];
-        bool[,] scratchPad;
+        bool[,] universe = new bool[UNIVERSE_WIDTH, UNIVERSE_HEIGHT];
+        bool[,] scratchPad = new bool[UNIVERSE_WIDTH, UNIVERSE_HEIGHT];
         // Drawing colors        
         Color gridColor = Color.Black;
         Color cellColor = Color.Gray;
@@ -48,9 +48,12 @@ namespace GOL
         private void NextGeneration()
         {
 
+           
 
             // Increment generation count
             generations++;
+
+           
 
             // Update status strip generations
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
@@ -62,7 +65,9 @@ namespace GOL
             if (!canTick)
                 return;
 
+           
             NextGeneration();
+             PerformSimulationOnScratchpad();
         }
 
         private void graphicsPanel1_Paint(object sender, PaintEventArgs e)
@@ -106,8 +111,10 @@ namespace GOL
 
                     //evaluate neighbors
                     int neighbors = 0;
-                    EvaluateNeighbors(x, y,ref neighbors, e,cellRect);
+                    int deadCellNeighbors = 0;
+                    EvaluateNeighbors(universe,x, y,ref neighbors,ref deadCellNeighbors ,e,cellRect);
                     PrintNeighborCount(neighbors, e, cellRect);
+                    PrintNeighborCount(deadCellNeighbors, e, cellRect);
                 }
             }
 
@@ -167,12 +174,13 @@ namespace GOL
         private void stopSimButton_Click(object sender, EventArgs e)
         {
             HandleOnStop();
-            ResetGenerations();
+           
         }
 
         private void stepSimButton_Click(object sender, EventArgs e)
         {
-
+            NextGeneration();
+            PerformSimulationOnScratchpad();
         }
 
         #region Utility
@@ -200,48 +208,59 @@ namespace GOL
             generations = 0;
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
         }
-        private void EvaluateNeighbors(int _sourceX, int _sourceY,ref int _neighborCount ,PaintEventArgs e, Rectangle _cellRect)
+        private void EvaluateNeighbors(bool[,] _targetCollection, int _sourceX, int _sourceY,ref int _liveCellNeighbors,ref int _deadCellNeighbors ,PaintEventArgs e = null, Rectangle _cellRect = new Rectangle())
         {
             
-            if (universe[_sourceX, _sourceY])
+            if (_targetCollection[_sourceX, _sourceY])
             {
-                EvaluateNeighbor(_sourceX + 1, _sourceY, ref _neighborCount);
-                EvaluateNeighbor(_sourceX + 1, _sourceY - 1, ref _neighborCount);
-                EvaluateNeighbor(_sourceX, _sourceY - 1, ref _neighborCount);
-                EvaluateNeighbor(_sourceX - 1, _sourceY - 1, ref _neighborCount);
-                EvaluateNeighbor(_sourceX - 1, _sourceY, ref _neighborCount);
-                EvaluateNeighbor(_sourceX - 1, _sourceY + 1, ref _neighborCount);
-                EvaluateNeighbor(_sourceX, _sourceY + 1, ref _neighborCount);
-                EvaluateNeighbor(_sourceX + 1, _sourceY + 1, ref _neighborCount);
+                EvaluateNeighbor(_targetCollection, _sourceX + 1, _sourceY ,ref _liveCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX + 1, _sourceY - 1 ,ref _liveCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX, _sourceY - 1, ref _liveCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX - 1, _sourceY - 1, ref _liveCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX - 1, _sourceY, ref _liveCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX - 1, _sourceY + 1, ref _liveCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX, _sourceY + 1, ref _liveCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX + 1, _sourceY + 1, ref _liveCellNeighbors);
+            }
+            else
+            {
+                EvaluateNeighbor(_targetCollection, _sourceX + 1, _sourceY, ref _deadCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX + 1, _sourceY - 1, ref _deadCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX, _sourceY - 1, ref _deadCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX - 1, _sourceY - 1, ref _deadCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX - 1, _sourceY, ref _deadCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX - 1, _sourceY + 1, ref _deadCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX, _sourceY + 1, ref _deadCellNeighbors);
+                EvaluateNeighbor(_targetCollection, _sourceX + 1, _sourceY + 1, ref _deadCellNeighbors);
             }
            
         }
-        private void EvaluateNeighbor(int _sourceX, int _sourceY, ref int _neighborCount)
+        private void EvaluateNeighbor(bool[,] _targetCollection, int _sourceX, int _sourceY,ref int _neighborCount)
         {
             int targetX = 0;
             int targetY = 0;
 
             if (_sourceX < 0)
             {
-                targetX = universe.GetLength(0) - 1;
+                targetX = _targetCollection.GetLength(0) - 1;
             }
             else
             {
-                targetX = _sourceX % universe.GetLength(0);
+                targetX = _sourceX % _targetCollection.GetLength(0);
             }
 
             if (_sourceY < 0)
             {
-                targetY = universe.GetLength(1) - 1;
+                targetY = _targetCollection.GetLength(1) - 1;
             }
             else
             {
-                targetY = _sourceY % universe.GetLength(1);
+                targetY = _sourceY % _targetCollection.GetLength(1);
             }
 
            
 
-            if (universe[targetX, targetY])
+            if (_targetCollection[targetX, targetY])
                 _neighborCount++;
 
         }
@@ -250,13 +269,114 @@ namespace GOL
             if (_neighborCount <= 0)
                 return;
 
-            Font font = new Font("Arial", 20f);
+            Font font = new Font("Arial", 100/UNIVERSE_HEIGHT);
 
             StringFormat stringFormat = new StringFormat();
             stringFormat.Alignment = StringAlignment.Center;
             stringFormat.LineAlignment = StringAlignment.Center;
 
             e.Graphics.DrawString(_neighborCount.ToString(), font, Brushes.Black, _cellRect, stringFormat);
+        }
+       private void CopyCollection(bool[,] _source, ref bool[,] _target)
+        {
+            for (int y = 0; y < _source.GetLength(1); y++)
+            {
+                // Iterate through the universe in the x, left to right
+                for (int x = 0; x < _source.GetLength(0); x++)
+                {
+                    _target[x, y] = _source[x, y];
+                }
+            }
+        }
+        private void SwapCollections(ref bool[,] _target, ref bool[,] _source)
+        {
+            bool[,] temp = _source;
+            _source = _target;
+            _target = temp;
+        }
+        private void PerformSimulationOnScratchpad()
+        {
+            CopyCollection(universe, ref scratchPad);
+
+            for (int y = 0; y < scratchPad.GetLength(1); y++)
+            {
+                // Iterate through the universe in the x, left to right
+                for (int x = 0; x < scratchPad.GetLength(0); x++)
+                {
+                    int neighborCount = 0;
+                    int deadCellNeighborCount = 0;
+                    EvaluateNeighbors(universe, x, y, ref neighborCount, ref deadCellNeighborCount);
+                    GOLRuleOne(x, y,neighborCount);
+                    GOLRuleTwo(x, y, neighborCount);
+                    GOLRuleThree(x, y, neighborCount);
+                    GOLRuleFour(x, y, deadCellNeighborCount);
+                }
+            }
+
+            SwapCollections(ref universe, ref scratchPad);
+            graphicsPanel1.Invalidate();
+        }
+        /// <summary>
+        /// Living cells with less than 2 living neighbors die in the next generation
+        /// </summary>
+        /// <param name="_sourceX"></param>
+        /// <param name="_sourceY"></param>
+        private void GOLRuleOne(int _sourceX, int _sourceY, int _neighborCount)
+        {
+            if (!universe[_sourceX, _sourceY])
+                return;
+            if(_neighborCount < 2)
+            {
+                scratchPad[_sourceX, _sourceY] = false;
+                
+            }
+        }
+        /// <summary>
+        /// Living cells with more than 3 living neighbors die in the next generation.
+        /// </summary>
+        /// <param name="_sourceX"></param>
+        /// <param name="_sourceY"></param>
+        /// <param name="_neighborCount"></param>
+        private void GOLRuleTwo(int _sourceX, int _sourceY, int _neighborCount)
+        {
+            if (!universe[_sourceX, _sourceY])
+                return;
+            if (_neighborCount > 3)
+            {
+                scratchPad[_sourceX, _sourceY] = false;
+            }
+        }
+        /// <summary>
+        /// Living cells with 2 or 3 living neighbors live in the next generation.
+        /// </summary>
+        /// <param name="_sourceX"></param>
+        /// <param name="_sourceY"></param>
+        /// <param name="_neighborCount"></param>
+        private void GOLRuleThree(int _sourceX, int _sourceY, int _neighborCount)
+        {
+            if (!universe[_sourceX, _sourceY])
+                return;
+            if (_neighborCount == 2 ||_neighborCount == 3)
+            {
+                scratchPad[_sourceX, _sourceY] = true;
+               
+            }
+        }
+        /// <summary>
+        /// Dead cells with exactly 3 living neighbors live in the next generation.
+        /// </summary>
+        /// <param name="_sourceX"></param>
+        /// <param name="_sourceY"></param>
+        /// <param name="_neighborCount"></param>
+        private void GOLRuleFour(int _sourceX, int _sourceY, int _neighborCount)
+        {
+            if (universe[_sourceX, _sourceY])
+                return;
+            if ( _neighborCount == 3)
+            {
+                scratchPad[_sourceX, _sourceY] = true;
+              
+            }
         }
         #endregion
     }
