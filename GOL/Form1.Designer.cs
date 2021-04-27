@@ -61,6 +61,7 @@ namespace GOL
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelGenerations = new System.Windows.Forms.ToolStripStatusLabel();
             this.graphicsPanel1 = new GOL.GraphicsPanel();
+            this.randomUniverse = new System.Windows.Forms.ToolStripButton();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -148,13 +149,13 @@ namespace GOL
             // customizeToolStripMenuItem
             // 
             this.customizeToolStripMenuItem.Name = "customizeToolStripMenuItem";
-            this.customizeToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.customizeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.customizeToolStripMenuItem.Text = "&Customize";
             // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.optionsToolStripMenuItem.Text = "&Options";
             // 
             // helpToolStripMenuItem
@@ -209,6 +210,7 @@ namespace GOL
             this.pauseSimButton,
             this.stopSimButton,
             this.stepSimButton,
+            this.randomUniverse,
             this.toolStripSeparator7,
             this.helpToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
@@ -332,6 +334,16 @@ namespace GOL
             this.graphicsPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.graphicsPanel1_Paint);
             this.graphicsPanel1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.graphicsPanel1_MouseClick);
             // 
+            // randomUniverse
+            // 
+            this.randomUniverse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.randomUniverse.Image = ((System.Drawing.Image)(resources.GetObject("randomUniverse.Image")));
+            this.randomUniverse.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.randomUniverse.Name = "randomUniverse";
+            this.randomUniverse.Size = new System.Drawing.Size(23, 22);
+            this.randomUniverse.Text = "randomUniverse";
+            this.randomUniverse.Click += new System.EventHandler(this.randomUniverse_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -388,6 +400,7 @@ namespace GOL
         private System.Windows.Forms.ToolStripButton pauseSimButton;
         private System.Windows.Forms.ToolStripButton stopSimButton;
         private System.Windows.Forms.ToolStripButton stepSimButton;
+        private System.Windows.Forms.ToolStripButton randomUniverse;
     }
 }
 

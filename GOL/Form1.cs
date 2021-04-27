@@ -30,6 +30,8 @@ namespace GOL
 
         bool canTick;
 
+        private int m_currentSeed;
+
         public Form1()
         {
             InitializeComponent();
@@ -41,7 +43,11 @@ namespace GOL
 
             pauseSimButton.Enabled = false;
             stopSimButton.Enabled = false;
+            stepSimButton.Enabled = false;
             canTick = false;
+
+            Random rand = new Random();
+            m_currentSeed = rand.Next(1000, int.MaxValue);
         }
 
         // Calculate the next generation of cells
@@ -187,7 +193,8 @@ namespace GOL
         private void HandleOnPause()
         {
             canTick = !canTick;
-
+            stepSimButton.Enabled = true;
+            startSimButton.Enabled = true;
         }
         private void HandleOnStop()
         {
@@ -195,6 +202,7 @@ namespace GOL
             startSimButton.Enabled = true;
             stopSimButton.Enabled = false;
             pauseSimButton.Enabled = false;
+            stepSimButton.Enabled = false;
         }
         private void HandleOnStart()
         {
@@ -380,5 +388,10 @@ namespace GOL
         }
         #endregion
 
+        private void randomUniverse_Click(object sender, EventArgs e)
+        {
+            ModalRandom mr = new ModalRandom();
+
+        }
     }
 }
