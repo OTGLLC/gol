@@ -13,6 +13,11 @@ namespace GOL
 {
     public partial class Form1 : Form
     {
+
+        StringBuilder sb;
+
+        private const string BOUNDARY_TOROIDAL = "Toroidal";
+        private const string BOUNDARY_FINITE = "Finite";
         private int m_univerWidth = 20;
         private int m_universeHeight = 20;
 
@@ -35,6 +40,10 @@ namespace GOL
         private bool m_useRandom;
         private int m_livingCells;
         private int m_generationalDelay;
+        private bool m_displayGrid;
+        private bool m_displayNeighborCount;
+        private bool m_displayHud;
+        private string m_boundaryType;
         public Form1()
         {
             InitializeComponent();
@@ -58,6 +67,11 @@ namespace GOL
             universe = new bool[m_univerWidth, m_universeHeight];
            scratchPad = new bool[m_univerWidth, m_universeHeight];
             m_livingCells = 0;
+            m_displayGrid = true;
+            m_displayNeighborCount = true;
+            m_displayHud = true;
+            sb = new StringBuilder();
+            m_boundaryType = BOUNDARY_TOROIDAL;
         }
         #region Template
 
@@ -86,6 +100,7 @@ namespace GOL
             NextGeneration();
              PerformSimulationOnScratchpad();
             UpdateLivingCellsDisplay();
+            PrintHUD();
         }
 
         private void graphicsPanel1_Paint(object sender, PaintEventArgs e)
@@ -125,7 +140,8 @@ namespace GOL
                     }
 
                     // Outline the cell with a pen
-                    e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
+                    if(m_displayGrid)
+                        e.Graphics.DrawRectangle(gridPen, cellRect.X, cellRect.Y, cellRect.Width, cellRect.Height);
 
                     //evaluate neighbors
                     int neighbors = 0;
@@ -173,6 +189,10 @@ namespace GOL
 
         #endregion
 
+
+
+
+        #region Utility
         private void CreateNewUniverse()
         {
             Random r;
@@ -184,16 +204,16 @@ namespace GOL
             {
                 r = new Random();
             }
-             
+
 
             for (int y = 0; y < universe.GetLength(1); y++)
             {
                 // Iterate through the universe in the x, left to right
                 for (int x = 0; x < universe.GetLength(0); x++)
                 {
-                    if(m_useRandom)
+                    if (m_useRandom)
                     {
-                        universe[x, y] = r.Next(0,2) > 0;
+                        universe[x, y] = r.Next(0, 2) > 0;
                     }
                     else
                     {
@@ -206,9 +226,6 @@ namespace GOL
             randomUniverse.Enabled = true;
             graphicsPanel1.Invalidate();
         }
-        
-
-        #region Utility
         private void UpdateLivingCellsDisplay()
         {
             m_livingCells = 0;
@@ -317,6 +334,9 @@ namespace GOL
         {
             if (_neighborCount <= 0)
                 return;
+            if (!m_displayNeighborCount)
+                return;
+
 
             Font font = new Font("Arial", 100/m_universeHeight);
 
@@ -365,7 +385,23 @@ namespace GOL
             SwapCollections(ref universe, ref scratchPad);
             graphicsPanel1.Invalidate();
         }
+        private void PrintHUD()
+        {
+            hudLabel.Visible = m_displayHud;
 
+            if (!m_displayHud)
+                return;
+            
+            sb.AppendLine($"Generation:\t\t{generations}");
+            sb.AppendLine($"Cell Count:\t\t{m_universeHeight*m_univerWidth}");
+            sb.AppendLine($"Boundary:\t\t{m_boundaryType}");
+            sb.AppendLine($"Universe Width:\t\t{m_univerWidth}");
+            sb.AppendLine($"Universe Height:\t\t{m_universeHeight}");
+
+            hudLabel.Text = sb.ToString();
+
+            sb.Clear();
+        }
         #endregion
 
         #region Events
@@ -389,6 +425,7 @@ namespace GOL
         {
             NextGeneration();
             PerformSimulationOnScratchpad();
+            UpdateLivingCellsDisplay();
         }
         private void randomUniverse_Click(object sender, EventArgs e)
         {
@@ -453,6 +490,22 @@ namespace GOL
             }
 
             
+        }
+        private void gridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            m_displayGrid = gridToolStripMenuItem.Checked;
+            graphicsPanel1.Invalidate();
+        }
+
+        private void neighborCountToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            m_displayNeighborCount = neighborCountToolStripMenuItem.Checked;
+            graphicsPanel1.Invalidate();
+        }
+
+        private void hUDToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            m_displayHud = hUDToolStripMenuItem.Checked;
         }
         #endregion
 
