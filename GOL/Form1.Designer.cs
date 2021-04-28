@@ -57,11 +57,12 @@ namespace GOL
             this.stepSimButton = new System.Windows.Forms.ToolStripButton();
             this.randomUniverse = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.settingsButton = new System.Windows.Forms.ToolStripButton();
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelGenerations = new System.Windows.Forms.ToolStripStatusLabel();
-            this.graphicsPanel1 = new GOL.GraphicsPanel();
             this.toolStripLivingCells = new System.Windows.Forms.ToolStripStatusLabel();
+            this.graphicsPanel1 = new GOL.GraphicsPanel();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -204,6 +205,7 @@ namespace GOL
             this.stepSimButton,
             this.randomUniverse,
             this.toolStripSeparator7,
+            this.settingsButton,
             this.helpToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
@@ -302,6 +304,16 @@ namespace GOL
             this.toolStripSeparator7.Name = "toolStripSeparator7";
             this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
             // 
+            // settingsButton
+            // 
+            this.settingsButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.settingsButton.Image = ((System.Drawing.Image)(resources.GetObject("settingsButton.Image")));
+            this.settingsButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.settingsButton.Name = "settingsButton";
+            this.settingsButton.Size = new System.Drawing.Size(23, 22);
+            this.settingsButton.Text = "toolStripButton1";
+            this.settingsButton.Click += new System.EventHandler(this.settingsButton_Click);
+            // 
             // helpToolStripButton
             // 
             this.helpToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -328,6 +340,12 @@ namespace GOL
             this.toolStripStatusLabelGenerations.Size = new System.Drawing.Size(90, 17);
             this.toolStripStatusLabelGenerations.Text = "Generations = 0";
             // 
+            // toolStripLivingCells
+            // 
+            this.toolStripLivingCells.Name = "toolStripLivingCells";
+            this.toolStripLivingCells.Size = new System.Drawing.Size(67, 17);
+            this.toolStripLivingCells.Text = "Living Cells";
+            // 
             // graphicsPanel1
             // 
             this.graphicsPanel1.BackColor = System.Drawing.SystemColors.Window;
@@ -338,12 +356,6 @@ namespace GOL
             this.graphicsPanel1.TabIndex = 3;
             this.graphicsPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.graphicsPanel1_Paint);
             this.graphicsPanel1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.graphicsPanel1_MouseClick);
-            // 
-            // toolStripLivingCells
-            // 
-            this.toolStripLivingCells.Name = "toolStripLivingCells";
-            this.toolStripLivingCells.Size = new System.Drawing.Size(67, 17);
-            this.toolStripLivingCells.Text = "Living Cells";
             // 
             // Form1
             // 
@@ -402,6 +414,7 @@ namespace GOL
         private System.Windows.Forms.ToolStripButton stepSimButton;
         private System.Windows.Forms.ToolStripButton randomUniverse;
         private System.Windows.Forms.ToolStripStatusLabel toolStripLivingCells;
+        private System.Windows.Forms.ToolStripButton settingsButton;
     }
 }
 

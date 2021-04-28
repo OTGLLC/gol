@@ -34,12 +34,14 @@ namespace GOL
         private bool m_useSeed;
         private bool m_useRandom;
         private int m_livingCells;
+        private int m_generationalDelay;
         public Form1()
         {
             InitializeComponent();
 
             // Setup the timer
-            timer.Interval = 100; // milliseconds
+            m_generationalDelay = 100;
+            timer.Interval = m_generationalDelay; // milliseconds
             timer.Tick += Timer_Tick;
             timer.Enabled = true; // start timer running
 
@@ -200,7 +202,7 @@ namespace GOL
                     UpdateLivingCellsDisplay();
                 }
             }
-            ResetGenerations();
+            ResetStatusBar();
             randomUniverse.Enabled = true;
             graphicsPanel1.Invalidate();
         }
@@ -247,10 +249,13 @@ namespace GOL
             startSimButton.Enabled = false;
             randomUniverse.Enabled = false;
         }
-        private void ResetGenerations()
+        private void ResetStatusBar()
         {
             generations = 0;
             toolStripStatusLabelGenerations.Text = "Generations = " + generations.ToString();
+
+            m_livingCells = 0;
+            toolStripLivingCells.Text = "Living Cells = " + m_livingCells.ToString();
         }
         private void EvaluateNeighbors(bool[,] _targetCollection, int _sourceX, int _sourceY,ref int _liveCellNeighbors,ref int _deadCellNeighbors ,PaintEventArgs e = null, Rectangle _cellRect = new Rectangle())
         {
@@ -414,6 +419,40 @@ namespace GOL
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LoadFromDisk();
+        }
+        private void settingsButton_Click(object sender, EventArgs e)
+        {
+            ModalSettings ms = new ModalSettings(m_universeHeight, m_univerWidth, m_generationalDelay);
+            HandleOnPause();
+
+          
+            if(DialogResult.OK == ms.ShowDialog())
+            {
+                int newHeight = ms.UniverseHeight;
+                int newWidth = ms.UniverseWidth;
+                m_generationalDelay = ms.GenerationalDelay;
+
+                if(newHeight != m_universeHeight || newWidth != m_univerWidth)
+                {
+                    Warning warn = new Warning("WARNING: The universe will be reset with this change");
+                    if(DialogResult.OK == warn.ShowDialog())
+                    {
+                        m_univerWidth = newWidth;
+                        m_universeHeight = newHeight;
+
+                        universe = new bool[m_univerWidth, m_universeHeight];
+                        scratchPad = new bool[m_univerWidth, m_universeHeight];
+
+
+                        ResetStatusBar();
+                        CreateNewUniverse();
+                    }
+                }
+
+                timer.Interval = m_generationalDelay;
+            }
+
+            
         }
         #endregion
 
@@ -592,6 +631,6 @@ namespace GOL
             }
         }
 
-        
+       
     }
 }

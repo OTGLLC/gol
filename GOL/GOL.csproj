@@ -61,13 +61,28 @@
     <Compile Include="ModalRandom.Designer.cs">
       <DependentUpon>ModalRandom.cs</DependentUpon>
     </Compile>
+    <Compile Include="ModalSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ModalSettings.Designer.cs">
+      <DependentUpon>ModalSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Warning.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Warning.Designer.cs">
+      <DependentUpon>Warning.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ModalRandom.resx">
       <DependentUpon>ModalRandom.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ModalSettings.resx">
+      <DependentUpon>ModalSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -78,6 +93,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Warning.resx">
+      <DependentUpon>Warning.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
