@@ -35,6 +35,9 @@ namespace GOL
             this.seedRandom = new System.Windows.Forms.RadioButton();
             this.seedDisplayPanel = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
+            this.seedTextBox = new System.Windows.Forms.TextBox();
+            this.randomSeedButton = new System.Windows.Forms.Button();
+            this.noRandom = new System.Windows.Forms.RadioButton();
             this.seedDisplayPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -61,12 +64,12 @@ namespace GOL
             // noSeedRandom
             // 
             this.noSeedRandom.AutoSize = true;
-            this.noSeedRandom.Location = new System.Drawing.Point(129, 92);
+            this.noSeedRandom.Location = new System.Drawing.Point(129, 101);
             this.noSeedRandom.Name = "noSeedRandom";
-            this.noSeedRandom.Size = new System.Drawing.Size(65, 17);
+            this.noSeedRandom.Size = new System.Drawing.Size(112, 17);
             this.noSeedRandom.TabIndex = 2;
             this.noSeedRandom.TabStop = true;
-            this.noSeedRandom.Text = "Random";
+            this.noSeedRandom.Text = "Random (no seed)";
             this.noSeedRandom.UseVisualStyleBackColor = true;
             // 
             // seedRandom
@@ -82,6 +85,8 @@ namespace GOL
             // 
             // seedDisplayPanel
             // 
+            this.seedDisplayPanel.Controls.Add(this.randomSeedButton);
+            this.seedDisplayPanel.Controls.Add(this.seedTextBox);
             this.seedDisplayPanel.Controls.Add(this.label1);
             this.seedDisplayPanel.Location = new System.Drawing.Point(12, 167);
             this.seedDisplayPanel.Name = "seedDisplayPanel";
@@ -92,12 +97,41 @@ namespace GOL
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 0);
+            this.label1.Location = new System.Drawing.Point(3, 10);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "Seed:";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // seedTextBox
+            // 
+            this.seedTextBox.Location = new System.Drawing.Point(48, 7);
+            this.seedTextBox.Name = "seedTextBox";
+            this.seedTextBox.Size = new System.Drawing.Size(223, 20);
+            this.seedTextBox.TabIndex = 1;
+            // 
+            // randomSeedButton
+            // 
+            this.randomSeedButton.Location = new System.Drawing.Point(277, 7);
+            this.randomSeedButton.Name = "randomSeedButton";
+            this.randomSeedButton.Size = new System.Drawing.Size(64, 23);
+            this.randomSeedButton.TabIndex = 2;
+            this.randomSeedButton.Text = "Random";
+            this.randomSeedButton.UseVisualStyleBackColor = true;
+            this.randomSeedButton.Click += new System.EventHandler(this.randomSeedButton_Click);
+            // 
+            // noRandom
+            // 
+            this.noRandom.AutoSize = true;
+            this.noRandom.Location = new System.Drawing.Point(129, 78);
+            this.noRandom.Name = "noRandom";
+            this.noRandom.Size = new System.Drawing.Size(113, 17);
+            this.noRandom.TabIndex = 5;
+            this.noRandom.TabStop = true;
+            this.noRandom.Text = "Do not Randomize";
+            this.noRandom.UseVisualStyleBackColor = true;
             // 
             // ModalRandom
             // 
@@ -106,6 +140,7 @@ namespace GOL
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(371, 279);
+            this.Controls.Add(this.noRandom);
             this.Controls.Add(this.seedDisplayPanel);
             this.Controls.Add(this.seedRandom);
             this.Controls.Add(this.noSeedRandom);
@@ -132,5 +167,8 @@ namespace GOL
         private System.Windows.Forms.RadioButton seedRandom;
         private System.Windows.Forms.Panel seedDisplayPanel;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox seedTextBox;
+        private System.Windows.Forms.Button randomSeedButton;
+        private System.Windows.Forms.RadioButton noRandom;
     }
 }

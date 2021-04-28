@@ -31,6 +31,8 @@ namespace GOL
         bool canTick;
 
         private int m_currentSeed;
+        private bool m_useSeed;
+        private bool m_useRandom;
 
         public Form1()
         {
@@ -48,6 +50,9 @@ namespace GOL
 
             Random rand = new Random();
             m_currentSeed = rand.Next(1000, int.MaxValue);
+            m_useSeed = false;
+            m_useRandom = false;
+            
         }
 
         // Calculate the next generation of cells
@@ -155,18 +160,42 @@ namespace GOL
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CreateNewUniverse();
+        }
+
+        private void CreateNewUniverse()
+        {
+            Random r;
+            if (m_useSeed)
+            {
+                r = new Random(m_currentSeed);
+            }
+            else
+            {
+                r = new Random();
+            }
+             
+
             for (int y = 0; y < universe.GetLength(1); y++)
             {
                 // Iterate through the universe in the x, left to right
                 for (int x = 0; x < universe.GetLength(0); x++)
                 {
-                    universe[x, y] = false;
+                    if(m_useRandom)
+                    {
+                        universe[x, y] = r.Next(0,2) > 0;
+                    }
+                    else
+                    {
+                        universe[x, y] = false;
+                    }
+                    
                 }
             }
             ResetGenerations();
+            randomUniverse.Enabled = true;
             graphicsPanel1.Invalidate();
         }
-
         private void startSimButton_Click(object sender, EventArgs e)
         {
             HandleOnStart();
@@ -203,6 +232,7 @@ namespace GOL
             stopSimButton.Enabled = false;
             pauseSimButton.Enabled = false;
             stepSimButton.Enabled = false;
+            
         }
         private void HandleOnStart()
         {
@@ -210,6 +240,7 @@ namespace GOL
             pauseSimButton.Enabled = true;
             stopSimButton.Enabled = true;
             startSimButton.Enabled = false;
+            randomUniverse.Enabled = false;
         }
         private void ResetGenerations()
         {
@@ -391,6 +422,14 @@ namespace GOL
         private void randomUniverse_Click(object sender, EventArgs e)
         {
             ModalRandom mr = new ModalRandom();
+            mr.OnDisplay(m_currentSeed);
+
+            if(DialogResult.OK == mr.ShowDialog())
+            {
+                m_useSeed = mr.UseSeed;
+                m_currentSeed = mr.CurrentSeed;
+                m_useRandom = mr.UseRandom;
+            }
 
         }
     }
