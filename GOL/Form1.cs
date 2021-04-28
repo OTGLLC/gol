@@ -306,18 +306,26 @@ namespace GOL
             int targetX = 0;
             int targetY = 0;
 
-            if (_sourceX < 0)
+            if (_sourceX < 0 && m_boundaryType == BOUNDARY_TOROIDAL)
             {
                 targetX = _targetCollection.GetLength(0) - 1;
+            }
+            else if(_sourceX < 0 && m_boundaryType == BOUNDARY_FINITE)
+            {
+                targetX = 0;
             }
             else
             {
                 targetX = _sourceX % _targetCollection.GetLength(0);
             }
 
-            if (_sourceY < 0)
+            if (_sourceY < 0 && m_boundaryType == BOUNDARY_TOROIDAL)
             {
                 targetY = _targetCollection.GetLength(1) - 1;
+            }
+            else if (_sourceY < 0 && m_boundaryType == BOUNDARY_FINITE)
+            {
+                targetY = 0;
             }
             else
             {
