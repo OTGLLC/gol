@@ -83,6 +83,7 @@ namespace GOL
            
             NextGeneration();
              PerformSimulationOnScratchpad();
+            UpdateLivingCellsDisplay();
         }
 
         private void graphicsPanel1_Paint(object sender, PaintEventArgs e)
@@ -156,7 +157,7 @@ namespace GOL
 
                 // Toggle the cell's state
                 universe[x, y] = !universe[x, y];
-                m_livingCells += (universe[x, y]) ? 1 : -1;
+                
                 UpdateLivingCellsDisplay();
                 // Tell Windows you need to repaint
                 graphicsPanel1.Invalidate();
@@ -196,7 +197,7 @@ namespace GOL
                     {
                         universe[x, y] = false;
                     }
-                    
+                    UpdateLivingCellsDisplay();
                 }
             }
             ResetGenerations();
@@ -208,6 +209,19 @@ namespace GOL
         #region Utility
         private void UpdateLivingCellsDisplay()
         {
+            m_livingCells = 0;
+            for (int y = 0; y < universe.GetLength(1); y++)
+            {
+                // Iterate through the universe in the x, left to right
+                for (int x = 0; x < universe.GetLength(0); x++)
+                {
+                    if(universe[x,y])
+                    {
+                        m_livingCells++;
+                    }
+                }
+            }
+             
             toolStripLivingCells.Text = "Living Cells = " + m_livingCells.ToString();
         }
         private void HandleOnPause()
