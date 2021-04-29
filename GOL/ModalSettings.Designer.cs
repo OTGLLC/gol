@@ -37,19 +37,9 @@ namespace GOL
             this.label3 = new System.Windows.Forms.Label();
             this.generationalDelayText = new System.Windows.Forms.TextBox();
             this.okButton = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.boundaryComboBox = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
-
-            // 
-            // okButton
-            // 
-            this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.okButton.Location = new System.Drawing.Point(13, 268);
-            this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(75, 23);
-            this.okButton.TabIndex = 8;
-            this.okButton.Text = "OK";
-            this.okButton.UseVisualStyleBackColor = true;
-
             // 
             // cancelButton
             // 
@@ -108,7 +98,33 @@ namespace GOL
             this.generationalDelayText.Name = "generationalDelayText";
             this.generationalDelayText.Size = new System.Drawing.Size(41, 20);
             this.generationalDelayText.TabIndex = 7;
-           
+            // 
+            // okButton
+            // 
+            this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.okButton.Location = new System.Drawing.Point(13, 268);
+            this.okButton.Name = "okButton";
+            this.okButton.Size = new System.Drawing.Size(75, 23);
+            this.okButton.TabIndex = 8;
+            this.okButton.Text = "OK";
+            this.okButton.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(16, 123);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(79, 13);
+            this.label4.TabIndex = 9;
+            this.label4.Text = "Boundary Type";
+            // 
+            // boundaryComboBox
+            // 
+            this.boundaryComboBox.FormattingEnabled = true;
+            this.boundaryComboBox.Location = new System.Drawing.Point(139, 116);
+            this.boundaryComboBox.Name = "boundaryComboBox";
+            this.boundaryComboBox.Size = new System.Drawing.Size(121, 21);
+            this.boundaryComboBox.TabIndex = 10;
             // 
             // ModalSettings
             // 
@@ -117,6 +133,8 @@ namespace GOL
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
             this.ClientSize = new System.Drawing.Size(415, 303);
+            this.Controls.Add(this.boundaryComboBox);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.okButton);
             this.Controls.Add(this.generationalDelayText);
             this.Controls.Add(this.label3);
@@ -145,5 +163,7 @@ namespace GOL
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox generationalDelayText;
         private System.Windows.Forms.Button okButton;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ComboBox boundaryComboBox;
     }
 }

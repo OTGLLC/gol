@@ -27,11 +27,14 @@ namespace GOL
         /// </summary>
         public int GenerationalDelay { get { return m_generationalDelay; } }
 
+        public Form1.BoundaryType BoundaryType { get; private set; }
+
         private int m_universeWidth;
         private int m_universeHeight;
         private int m_generationalDelay;
+        private bool m_boundaryChangedOnInit = false;
 
-        public ModalSettings(int _uniHeight, int _uniWidth, int _delay)
+        public ModalSettings(int _uniHeight, int _uniWidth, int _delay, Form1.BoundaryType _boundaryType)
         {
             InitializeComponent();
 
@@ -43,11 +46,35 @@ namespace GOL
             m_universeHeight = _uniHeight;
             m_generationalDelay = _delay;
 
+            m_boundaryChangedOnInit = true;
+            BoundaryType = _boundaryType;
+
             universeWidthText.TextChanged += UniverseWidthText_TextChanged;
             universeHeightText.TextChanged += UniverseHeightText_TextChanged;
             generationalDelayText.TextChanged += GenerationalDelayText_TextChanged;
+
+            boundaryComboBox.SelectedIndexChanged += BoundaryComboBox_SelectedIndexChanged;
+
+            InitializeBoundaryComboBox();
         }
 
+        #region Events
+        private void BoundaryComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(!m_boundaryChangedOnInit)
+            {
+                BoundaryType = (Form1.BoundaryType)boundaryComboBox.SelectedItem;
+                
+            }
+
+            m_boundaryChangedOnInit = false;
+        }
+
+        private void InitializeBoundaryComboBox()
+        {
+            boundaryComboBox.DataSource = Enum.GetValues(typeof(Form1.BoundaryType));
+            boundaryComboBox.SelectedItem = BoundaryType;
+        }
         private void GenerationalDelayText_TextChanged(object sender, EventArgs e)
         {
             ValidateTextToInt(ref generationalDelayText, ref m_generationalDelay);
@@ -85,5 +112,7 @@ namespace GOL
                 _destination = int.Parse(_target.Text);
             }
         }
+
+        #endregion
     }
 }

@@ -14,10 +14,14 @@ namespace GOL
     public partial class Form1 : Form
     {
 
+        public enum BoundaryType
+        {
+            Torodial,
+            Finite
+        }
+
         StringBuilder sb;
 
-        private const string BOUNDARY_TOROIDAL = "Toroidal";
-        private const string BOUNDARY_FINITE = "Finite";
         private int m_univerWidth = 20;
         private int m_universeHeight = 20;
 
@@ -43,7 +47,7 @@ namespace GOL
         private bool m_displayGrid;
         private bool m_displayNeighborCount;
         private bool m_displayHud;
-        private string m_boundaryType;
+        private BoundaryType m_boundaryType;
         public Form1()
         {
             InitializeComponent();
@@ -71,7 +75,7 @@ namespace GOL
             m_displayNeighborCount = true;
             m_displayHud = true;
             sb = new StringBuilder();
-            m_boundaryType = BOUNDARY_TOROIDAL;
+            m_boundaryType = BoundaryType.Torodial;
         }
         #region Template
 
@@ -306,11 +310,11 @@ namespace GOL
             int targetX = 0;
             int targetY = 0;
 
-            if (_sourceX < 0 && m_boundaryType == BOUNDARY_TOROIDAL)
+            if (_sourceX < 0 && m_boundaryType == BoundaryType.Torodial)
             {
                 targetX = _targetCollection.GetLength(0) - 1;
             }
-            else if(_sourceX < 0 && m_boundaryType == BOUNDARY_FINITE)
+            else if(_sourceX < 0 && m_boundaryType == BoundaryType.Finite)
             {
                 targetX = 0;
             }
@@ -319,11 +323,11 @@ namespace GOL
                 targetX = _sourceX % _targetCollection.GetLength(0);
             }
 
-            if (_sourceY < 0 && m_boundaryType == BOUNDARY_TOROIDAL)
+            if (_sourceY < 0 && m_boundaryType == BoundaryType.Torodial)
             {
                 targetY = _targetCollection.GetLength(1) - 1;
             }
-            else if (_sourceY < 0 && m_boundaryType == BOUNDARY_FINITE)
+            else if (_sourceY < 0 && m_boundaryType == BoundaryType.Finite)
             {
                 targetY = 0;
             }
@@ -467,7 +471,7 @@ namespace GOL
         }
         private void settingsButton_Click(object sender, EventArgs e)
         {
-            ModalSettings ms = new ModalSettings(m_universeHeight, m_univerWidth, m_generationalDelay);
+            ModalSettings ms = new ModalSettings(m_universeHeight, m_univerWidth, m_generationalDelay, m_boundaryType);
             HandleOnPause();
 
           
@@ -476,14 +480,16 @@ namespace GOL
                 int newHeight = ms.UniverseHeight;
                 int newWidth = ms.UniverseWidth;
                 m_generationalDelay = ms.GenerationalDelay;
+                BoundaryType newBoundaryType = ms.BoundaryType;
 
-                if(newHeight != m_universeHeight || newWidth != m_univerWidth)
+                if(newHeight != m_universeHeight || newWidth != m_univerWidth || newBoundaryType != m_boundaryType)
                 {
                     Warning warn = new Warning("WARNING: The universe will be reset with this change");
                     if(DialogResult.OK == warn.ShowDialog())
                     {
                         m_univerWidth = newWidth;
                         m_universeHeight = newHeight;
+                        m_boundaryType = newBoundaryType;
 
                         universe = new bool[m_univerWidth, m_universeHeight];
                         scratchPad = new bool[m_univerWidth, m_universeHeight];
