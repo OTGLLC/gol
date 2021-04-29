@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace GOL
 {
     public partial class Form1 : Form
@@ -63,6 +64,10 @@ namespace GOL
             stepSimButton.Enabled = false;
             canTick = false;
 
+            gridToolStripMenuItem.Checked = true;
+            neighborCountToolStripMenuItem.Checked = true;
+           hUDToolStripMenuItem.Checked = true;
+
             Random rand = new Random();
             m_currentSeed = rand.Next(1000, int.MaxValue);
             m_useSeed = false;
@@ -76,6 +81,8 @@ namespace GOL
             m_displayHud = true;
             sb = new StringBuilder();
             m_boundaryType = BoundaryType.Torodial;
+
+            PrintHUD();
         }
         #region Template
 
@@ -223,9 +230,10 @@ namespace GOL
                     {
                         universe[x, y] = false;
                     }
-                    UpdateLivingCellsDisplay();
+                   
                 }
             }
+            UpdateLivingCellsDisplay();
             ResetStatusBar();
             randomUniverse.Enabled = true;
             graphicsPanel1.Invalidate();
@@ -268,7 +276,6 @@ namespace GOL
             pauseSimButton.Enabled = true;
             stopSimButton.Enabled = true;
             startSimButton.Enabled = false;
-            randomUniverse.Enabled = false;
         }
         private void ResetStatusBar()
         {
@@ -410,9 +417,133 @@ namespace GOL
             sb.AppendLine($"Universe Width:\t\t{m_univerWidth}");
             sb.AppendLine($"Universe Height:\t\t{m_universeHeight}");
 
+            if(!m_useRandom)
+            {
+                sb.AppendLine($"Randomize Universe:\t\t false");
+            }
+            else if(m_useRandom && m_useSeed)
+            {
+                sb.AppendLine($"Randomize Universe: Random with seed");
+                sb.AppendLine($"Seed:\t\t {m_currentSeed}");
+            }
+            else if(m_useRandom && !m_useSeed)
+            {
+                sb.AppendLine($"Randomize Universe: Random with time");
+            }
+            
+
             hudLabel.Text = sb.ToString();
 
             sb.Clear();
+        }
+        private void SaveToDisk()
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Filter = "All Files|*.*|Cells|*.cells";
+            dlg.FilterIndex = 2; dlg.DefaultExt = "cells";
+
+
+            if (DialogResult.OK == dlg.ShowDialog())
+            {
+                StreamWriter writer = new StreamWriter(dlg.FileName);
+
+                writer.WriteLine($"Height-{m_universeHeight}");
+                writer.WriteLine($"Width-{m_univerWidth}");
+                // Iterate through the universe one row at a time.
+                for (int y = 0; y < universe.GetLength(1); y++)
+                {
+                    // Create a string to represent the current row.
+                    String currentRow = string.Empty;
+
+                    // Iterate through the current row one cell at a time.
+                    for (int x = 0; x < universe.GetLength(0); x++)
+                    {
+                        currentRow = (universe[x, y] == true) ? $"({x},{y})-1" : $"({x},{y})-0";
+                        writer.WriteLine(currentRow);
+                    }
+
+
+                }
+
+                // After all rows and columns have been written then close the file.
+                writer.Close();
+            }
+        }
+
+        private bool ParseUniverseCell(string _cellID, string _value)
+        {
+            //Hacky, gonna cheat a bit since we know the length of the prefix (x,y), Will be FUBAR if someone messes with the 
+            //file manually
+            int xPos = -1;
+            int yPos = -1;
+            int cellAlive = -1;
+
+            string cellStripped = _cellID.Trim(new char[] { '(', ')' });
+            string[] cellIDCleaned = cellStripped.Split(',');
+
+            if (!int.TryParse(cellIDCleaned[0].ToString(), out xPos))
+            {
+                return false;
+            }
+            else if (!int.TryParse(cellIDCleaned[1].ToString(), out yPos))
+            {
+                return false;
+            }
+            else if (!int.TryParse(_value, out cellAlive))
+            {
+                return false;
+            }
+
+            universe[xPos, yPos] = (cellAlive == 1) ? true : false;
+            return true;
+
+        }
+        private void LoadFromDisk()
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "All Files|*.*|Cells|*.cells";
+            dlg.FilterIndex = 2;
+
+            if (DialogResult.OK == dlg.ShowDialog())
+            {
+                StreamReader reader = new StreamReader(dlg.FileName);
+
+                // Create a couple variables to calculate the width and height
+                // of the data in the file.
+
+                // Iterate through the file once to get its size.
+                while (!reader.EndOfStream)
+                {
+                    // Read one row at a time.
+                    string row = reader.ReadLine();
+
+                    string[] entry = row.Split('-');
+                    if (entry[0].Equals("Height", StringComparison.OrdinalIgnoreCase))
+                    {
+                        m_universeHeight = int.Parse(entry[1]);
+                    }
+                    if (entry[0].Equals("Width", StringComparison.OrdinalIgnoreCase))
+                    {
+                        m_univerWidth = int.Parse(entry[1]);
+
+                        universe = new bool[m_univerWidth, m_universeHeight];
+                        scratchPad = new bool[m_univerWidth, m_universeHeight];
+
+                    }
+                    ParseUniverseCell(entry[0], entry[1]);
+
+
+                }
+
+
+                // Close the file.
+                reader.Close();
+
+                UpdateLivingCellsDisplay();
+                ResetStatusBar();
+                PrintHUD();
+                graphicsPanel1.Invalidate();
+            }
         }
         #endregion
 
@@ -438,11 +569,12 @@ namespace GOL
             NextGeneration();
             PerformSimulationOnScratchpad();
             UpdateLivingCellsDisplay();
+            PrintHUD();
         }
         private void randomUniverse_Click(object sender, EventArgs e)
         {
             ModalRandom mr = new ModalRandom();
-            mr.OnDisplay(m_currentSeed);
+            mr.OnDisplay(m_useRandom,m_useSeed, m_currentSeed);
 
             if (DialogResult.OK == mr.ShowDialog())
             {
@@ -451,7 +583,7 @@ namespace GOL
                 m_useRandom = mr.UseRandom;
                 CreateNewUniverse();
             }
-
+            PrintHUD();
         }
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -472,7 +604,7 @@ namespace GOL
         private void settingsButton_Click(object sender, EventArgs e)
         {
             ModalSettings ms = new ModalSettings(m_universeHeight, m_univerWidth, m_generationalDelay, m_boundaryType);
-            HandleOnPause();
+            canTick = false;
 
           
             if(DialogResult.OK == ms.ShowDialog())
@@ -520,6 +652,11 @@ namespace GOL
         private void hUDToolStripMenuItem_Click(object sender, EventArgs e)
         {
             m_displayHud = hUDToolStripMenuItem.Checked;
+            hudLabel.Visible = hUDToolStripMenuItem.Checked;
+        }
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
         }
         #endregion
 
@@ -589,115 +726,7 @@ namespace GOL
         }
         #endregion
 
-        private void SaveToDisk()
-        {
-            SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Filter = "All Files|*.*|Cells|*.cells";
-            dlg.FilterIndex = 2; dlg.DefaultExt = "cells";
-
-
-            if (DialogResult.OK == dlg.ShowDialog())
-            {
-                StreamWriter writer = new StreamWriter(dlg.FileName);
-
-                writer.WriteLine($"Height-{Height}");
-                writer.WriteLine($"Width-{Width}");
-                // Iterate through the universe one row at a time.
-                for (int y = 0; y < universe.GetLength(1); y++)
-                {
-                    // Create a string to represent the current row.
-                    String currentRow = string.Empty;
-
-                    // Iterate through the current row one cell at a time.
-                    for (int x = 0; x < universe.GetLength(0); x++)
-                    {
-                        currentRow = (universe[x, y] == true) ? $"({x},{y})-1" : $"({x},{y})-0";
-                        writer.WriteLine(currentRow);
-                    }
-
-
-                }
-
-                // After all rows and columns have been written then close the file.
-                writer.Close();
-            }
-        }
-        private bool ParseUniverseDims(string _label,string _key,string _value,ref int _dimension)
-        {
-            if(_key.Equals(_label, StringComparison.OrdinalIgnoreCase))
-            {
-                if(!int.TryParse(_value, out _dimension))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        private bool ParseUniverseCell(string _cellID, string _value)
-        {
-            //Hacky, gonna cheat a bit since we know the length of the prefix (x,y), Will be FUBAR if someone messes with the 
-            //file manually
-            int xPos = -1;
-            int yPos = -1;
-            int cellAlive = -1;
-
-            if(!int.TryParse(_cellID[1].ToString(), out xPos))
-            {
-                return false;
-            }
-           else if(!int.TryParse(_cellID[3].ToString(), out yPos))
-            {
-                return false;
-            }
-            else if(!!int.TryParse(_value, out cellAlive))
-            {
-                return false;
-            }
-
-            universe[xPos, yPos] = (cellAlive == 1) ? true : false;
-            return true;
-
-        }
-        private void LoadFromDisk()
-        {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "All Files|*.*|Cells|*.cells";
-            dlg.FilterIndex = 2;
-
-            if (DialogResult.OK == dlg.ShowDialog())
-            {
-                StreamReader reader = new StreamReader(dlg.FileName);
-
-                // Create a couple variables to calculate the width and height
-                // of the data in the file.
-              
-                // Iterate through the file once to get its size.
-                while (!reader.EndOfStream)
-                {
-                    // Read one row at a time.
-                    string row = reader.ReadLine();
-
-                    string[] entry = row.Split('-');
-                    if (ParseUniverseDims(entry[0], "Height", entry[1], ref m_universeHeight))
-                    {
-                        entry = reader.ReadLine().Split('-');
-                    }
-                    else if (ParseUniverseDims(entry[0], "Width", entry[1], ref m_univerWidth))
-                    {
-                        entry = reader.ReadLine().Split('-');
-                        universe = new bool[m_univerWidth, m_universeHeight];
-                    }
-                    else if (ParseUniverseCell(entry[0], entry[1])) { }
-                   
-                  
-                }
-
-               
-                // Close the file.
-                reader.Close();
-            }
-        }
-
+       
        
     }
 }

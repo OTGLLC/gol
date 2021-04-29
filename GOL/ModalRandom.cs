@@ -25,9 +25,23 @@ namespace GOL
 
             seedDisplayPanel.Enabled = false;
         }
-        public void OnDisplay(int _currentSeed)
+        public void OnDisplay(bool _useRandom, bool _useSeed,int _currentSeed)
         {
             seedTextBox.Text = _currentSeed.ToString();
+            CurrentSeed = _currentSeed;
+
+            if(!_useRandom)
+            {
+                noRandom.Checked = true;
+            }
+            else if(_useSeed)
+            {
+                seedRandom.Checked = true;
+            }
+            else if(_useRandom && !_useSeed)
+            {
+                noSeedRandom.Checked = true;
+            }
         }
         private void SeedRandom_CheckedChanged(object sender, EventArgs e)
         {
@@ -62,6 +76,7 @@ namespace GOL
         {
             Random r = new Random();
             seedTextBox.Text = r.Next(1000, int.MaxValue).ToString();
+            CurrentSeed = int.Parse(seedTextBox.Text);
         }
     }
 }
