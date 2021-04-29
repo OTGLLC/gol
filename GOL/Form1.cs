@@ -31,6 +31,7 @@ namespace GOL
         // Drawing colors        
         Color gridColor = Color.Black;
         Color cellColor = Color.Gray;
+        Color backgroundColor = Color.White;
 
         // The Timer class
         Timer timer = new Timer();
@@ -121,7 +122,7 @@ namespace GOL
             int cellWidth = graphicsPanel1.ClientSize.Width / universe.GetLength(0);
             // CELL HEIGHT = WINDOW HEIGHT / NUMBER OF CELLS IN Y
             int cellHeight = graphicsPanel1.ClientSize.Height / universe.GetLength(1);
-
+            graphicsPanel1.BackColor = backgroundColor;
 
             // A Pen for drawing the grid lines (color, width)
             Pen gridPen = new Pen(gridColor, 1);
@@ -436,6 +437,16 @@ namespace GOL
 
             sb.Clear();
         }
+        private void ChangeElementColor(ref Color _targetColor)
+        {
+            ColorDialog cDialog = new ColorDialog();
+
+            cDialog.AllowFullOpen = false;
+            if (cDialog.ShowDialog() == DialogResult.OK)
+                _targetColor = cDialog.Color;
+
+            graphicsPanel1.Invalidate();
+        }
         private void SaveToDisk()
         {
             SaveFileDialog dlg = new SaveFileDialog();
@@ -658,6 +669,21 @@ namespace GOL
         {
 
         }
+        private void gridToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            ChangeElementColor(ref gridColor);
+        }
+       
+
+        private void backgroundToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ChangeElementColor(ref backgroundColor);
+        }
+
+        private void liveCellsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ChangeElementColor(ref cellColor);
+        }
         #endregion
 
         #region GOL Rules
@@ -724,9 +750,10 @@ namespace GOL
 
             }
         }
+
+
         #endregion
 
-       
-       
+      
     }
 }
